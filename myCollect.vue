@@ -92,7 +92,7 @@ const getData = () => {
 };
 const handleToDetail = (e) => {
   console.log(document.URL);
-  const url = `/app/community/pure-page/nZ-lFmwb?id=${e.id}&from=fav`;
+  const url = `/app/community/pure-page/nZ-lFmwb?id=${e.id}&referer=${window.location.href}`;
   window.location.href = url;
 };
 const handleTopicAction = (type, data) => {

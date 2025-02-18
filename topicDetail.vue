@@ -70,43 +70,48 @@
               <div :id="item.assistant_message.id" v-if="item.assistant_message.content">
                 <div class="message-item right">
                   <div style="width:184px;"></div>
-                  <div
-                    :class="['message-item-content',`${item.assistant_message.role == 'user' ? 'user':''}`,pre_message_id == item.assistant_message.id ? 'animation':'']">
-                    <div class="text">
-                      <Markdown v-model="item.assistant_message.content" :toolbarsFlag="false" />
-                    </div>
-                    <div class="base-box flex" style="justify-content:space-between">
-                      <div class="flex">
-                        <div class="flex" @click="handleCopy(item.assistant_message.content)" style="cursor:pointer">
-                          <!-- <el-icon size="11" color="#5C5C5C" style="margin-right:4px;">
+                  <div>
+                    <div
+                      :class="['message-item-content',`${item.assistant_message.role == 'user' ? 'user':''}`,pre_message_id == item.assistant_message.id ? 'animation':'']">
+                      <div class="text">
+                        <Markdown v-model="item.assistant_message.content" :toolbarsFlag="false" />
+                      </div>
+                      <div class="base-box flex" style="justify-content:space-between">
+                        <div class="flex">
+                          <div class="flex" @click="handleCopy(item.assistant_message.content)" style="cursor:pointer">
+                            <!-- <el-icon size="11" color="#5C5C5C" style="margin-right:4px;">
                           <DocumentCopy />
                         </el-icon> -->
-                          <img src="https://assets.jiker.com/_for_common_project/2024/1227/admin/zfN6Z1BXawNf9UvNhJjPLoFW8u8iDFYcG6j5Yb3f.svg" />
-                          <div class="text">复制</div>
-                        </div>
-                        <div class="flex" @click="handleTopicMessageAction(1, item.assistant_message)"
-                          style="cursor:pointer;margin-left: 10px;">
-                          <img
+                            <img src="https://assets.jiker.com/_for_common_project/2024/1227/admin/zfN6Z1BXawNf9UvNhJjPLoFW8u8iDFYcG6j5Yb3f.svg" />
+                            <div class="text">复制</div>
+                          </div>
+                          <div class="flex" @click="handleTopicMessageAction(1, item.assistant_message)"
+                            style="cursor:pointer;margin-left: 10px;">
+                            <img
                           :src="!item.assistant_message.favorite_active ? 'https://assets.jiker.com/_for_common_project/2024/1227/admin/AnhT4Inxw4lkcEF6spx5WFJImQdmS3VS6LUgbEsL.svg' : 'https://assets.jiker.com/_for_common_project/2024/1227/admin/hFiJogbyXyfqh3S2cFJrIvOd0uiqyRHln32LahWJ.svg'"
                           alt="" />
-                          <div class="text">{{ item.assistant_message.favorite.length || '喜欢' }}</div>
-                        </div>
-                        <div class="flex" style="margin-left: 10px;cursor:pointer"
-                          @click="handleTopicMessageAction(2, item.assistant_message)">
-                          <img
+                            <div class="text">{{ item.assistant_message.favorite.length || '喜欢' }}</div>
+                          </div>
+                          <div class="flex" style="margin-left: 10px;cursor:pointer"
+                            @click="handleTopicMessageAction(2, item.assistant_message)">
+                            <img
                           :src="!item.assistant_message.collect_active ? 'https://assets.jiker.com/_for_common_project/2024/1227/admin/zzRTqjWwocSpW41IHUWuk1hpxcmyZnYnjl78vf45.svg' : 'https://assets.jiker.com/_for_common_project/2024/1227/admin/YRXLLtRFV2Dqog9MWzqRTOKewC35IDYzd1IyAHVD.svg'"
                           alt="" />
-                          <div class="text">{{ item.assistant_message.collect.length || '收藏' }}</div>
+                            <div class="text">{{ item.assistant_message.collect.length || '收藏' }}</div>
+                          </div>
                         </div>
+                        <el-tooltip class="box-item" effect="dark" content="在此回答的基础上继续提问" placement="top">
+                          <div class="quote-btn" @click.stop="handleQuote(item.assistant_message,index,null)"
+                            style="cursor:pointer;margin-left: 10px;">
+                            追问
+                          </div>
+                        </el-tooltip>
                       </div>
-                      <el-tooltip class="box-item" effect="dark" content="在此回答的基础上继续提问" placement="top">
-                        <div class="quote-btn" @click.stop="handleQuote(item.assistant_message,index,null)"
-                          style="cursor:pointer;margin-left: 10px;">
-                          追问
-                        </div>
-                      </el-tooltip>
                     </div>
+                    <div class="ai-info">内容由AI大模型生成，请仔细甄别</div>
                   </div>
+  
+  
                 </div>
               </div>
   
@@ -132,8 +137,9 @@
                 </div>
   
                 <el-tooltip class="box-item" effect="dark" content="删除" placement="top">
-                  <div class="item-quote-close" @click="quoteId=null,message = null">
+                  <div class="item-quote-close" @click="quoteId=null,message = null"></div>
                 </el-tooltip>
+  
               </div>
   
               <div v-if="(currentIndex+1) == index && btnLoading" class="loading-box">
@@ -181,39 +187,42 @@
               <div :id="item.assistant_message.id">
                 <div class="message-item">
                   <div style="width:184px;"></div>
-                  <div
-                    :class="['message-item-content',`${item.assistant_message.role == 'user' ? 'user':''}`,pre_message_id == item.assistant_message.id ? 'animation':'']">
-                    <div class="text">
-                      <Markdown v-model="item.assistant_message.content" :toolbarsFlag="false" />
-                    </div>
-                    <div class="base-box flex" style="justify-content:space-between">
-                      <div class="flex">
-                        <div class="flex" @click="handleCopy(item.assistant_message.content)" style="cursor:pointer">
-                          <img src="https://assets.jiker.com/_for_common_project/2024/1227/admin/zfN6Z1BXawNf9UvNhJjPLoFW8u8iDFYcG6j5Yb3f.svg" />
-                          <div class="text">复制</div>
-                        </div>
-                        <div class="flex" @click="handleTopicMessageAction(1, item.assistant_message)"
-                          style="cursor:pointer;margin-left: 10px;">
-                          <img
+                  <div>
+                    <div
+                      :class="['message-item-content',`${item.assistant_message.role == 'user' ? 'user':''}`,pre_message_id == item.assistant_message.id ? 'animation':'']">
+                      <div class="text">
+                        <Markdown v-model="item.assistant_message.content" :toolbarsFlag="false" />
+                      </div>
+                      <div class="base-box flex" style="justify-content:space-between">
+                        <div class="flex">
+                          <div class="flex" @click="handleCopy(item.assistant_message.content)" style="cursor:pointer">
+                            <img src="https://assets.jiker.com/_for_common_project/2024/1227/admin/zfN6Z1BXawNf9UvNhJjPLoFW8u8iDFYcG6j5Yb3f.svg" />
+                            <div class="text">复制</div>
+                          </div>
+                          <div class="flex" @click="handleTopicMessageAction(1, item.assistant_message)"
+                            style="cursor:pointer;margin-left: 10px;">
+                            <img
                           :src="!item.assistant_message.favorite_active ? 'https://assets.jiker.com/_for_common_project/2024/1227/admin/AnhT4Inxw4lkcEF6spx5WFJImQdmS3VS6LUgbEsL.svg' : 'https://assets.jiker.com/_for_common_project/2024/1227/admin/hFiJogbyXyfqh3S2cFJrIvOd0uiqyRHln32LahWJ.svg'"
                           alt="" />
-                          <div class="text">{{ item.assistant_message.favorite.length || '喜欢' }}</div>
-                        </div>
-                        <div class="flex" style="margin-left: 10px;cursor:pointer"
-                          @click="handleTopicMessageAction(2, item.assistant_message)">
-                          <img
+                            <div class="text">{{ item.assistant_message.favorite.length || '喜欢' }}</div>
+                          </div>
+                          <div class="flex" style="margin-left: 10px;cursor:pointer"
+                            @click="handleTopicMessageAction(2, item.assistant_message)">
+                            <img
                           :src="!item.assistant_message.collect_active ? 'https://assets.jiker.com/_for_common_project/2024/1227/admin/zzRTqjWwocSpW41IHUWuk1hpxcmyZnYnjl78vf45.svg' : 'https://assets.jiker.com/_for_common_project/2024/1227/admin/YRXLLtRFV2Dqog9MWzqRTOKewC35IDYzd1IyAHVD.svg'"
                           alt="" />
-                          <div class="text">{{ item.assistant_message.collect.length || '收藏' }}</div>
+                            <div class="text">{{ item.assistant_message.collect.length || '收藏' }}</div>
+                          </div>
                         </div>
+                        <el-tooltip class="box-item" effect="dark" content="在此回答的基础上继续提问" placement="top">
+                          <div class="quote-btn" @click.stop="handleQuote(item.assistant_message,index,null)"
+                            style="cursor:pointer;margin-left: 10px;">
+                            追问
+                          </div>
+                        </el-tooltip>
                       </div>
-                      <el-tooltip class="box-item" effect="dark" content="在此回答的基础上继续提问" placement="top">
-                        <div class="quote-btn" @click.stop="handleQuote(item.assistant_message,index,null)"
-                          style="cursor:pointer;margin-left: 10px;">
-                          追问
-                        </div>
-                      </el-tooltip>
                     </div>
+                    <div class="ai-info" style="text-align:left;">内容由AI大模型生成，请仔细甄别</div>
                   </div>
                 </div>
   
@@ -238,7 +247,7 @@
                   </div>
   
                   <el-tooltip class="box-item" effect="dark" content="删除" placement="top">
-                    <div class="item-quote-close" @click="quoteId=null,message = null">
+                    <div class="item-quote-close" @click="quoteId=null,message = null"></div>
                   </el-tooltip>
                 </div>
               </div>
@@ -279,7 +288,7 @@
   import { reactive, ref,nextTick,watch,computed } from "vue";
   const message = ref("");
   const newTag = ref("");
-  const form = ref("");
+  const referer = ref("");
   const pre_message_id = ref("");
   const currentIndex = ref("");
   const currentChildIndex = ref("");
@@ -362,26 +371,8 @@
       formTagStatus.value = true;
     }
   };
-  const handleBack = () => {
-    let url = null;
-  
-    switch (form.value) {
-      case "home":
-        url='/app/community/my/answer/index';
-        break;
-      case "my":
-        url='/app/community/my/answer/my';
-        break;
-      case "fav":
-        url='/app/community/my/answer/fav';
-        break;
-      case "admin":
-        url='/app/community/admin/topic';
-        break;
-      default:
-        break;
-    }
-    window.location.href = url;
+  const handleBack = () => { 
+    window.location.href = referer.value;
   }
   const handleScroll = (data) => {
     const targetElement = document.getElementById(data.user_message.pre_message_id);
@@ -588,13 +579,23 @@
     })
   }
   const currentUrl = new URL(window.location.href);
-  topic_id.value = currentUrl.searchParams.get('id') || 130;
-  form.value = currentUrl.searchParams.get('from');
+  topic_id.value = currentUrl.searchParams.get('id') || 177;
+  referer.value = currentUrl.searchParams.get('referer');
   // topic_id.value = 51;
   
   getUserInfo()
   </script>
   <style scoped>
+    .ai-info {
+      text-align: right;
+      margin-top: 8px;
+      font-family: PingFangSC, PingFang SC;
+      font-weight: 400;
+      font-size: 12px;
+      color: rgba(0, 0, 0, 0.25);
+      line-height: 20px;
+    }
+  
     .loading-box {
       width: 660px;
       height: 96px;
@@ -895,8 +896,9 @@
               .message-item-base {
                 text-align: left;
               }
-              .message-item-img{
-                margin:0px 8px 0 12px;
+  
+              .message-item-img {
+                margin: 0px 8px 0 12px;
               }
   
             }

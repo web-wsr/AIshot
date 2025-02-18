@@ -6,7 +6,6 @@
         <div class="topic-item-time">{{ item.date }}</div>
         <div
           class="topic-item-content"
-          @click.stop="handleToDetail(topic)"
           v-for="(topic, index) in item.topics"
           :key="topic.id"
         >
@@ -14,55 +13,62 @@
             class="topic-item-title flex"
             style="justify-content: space-between"
           >
-            <div class="text">
+            <div class="text" @click.stop="handleToDetail(topic)">
               {{ topic.title }}
             </div>
-            <div
-              :class="['topic-item-type', topic.is_open == 1 ? 'active' : '']"
-            >
-              {{ topic.is_open == 1 ? "公开" : "私密" }}
+            <!-- <div :class="['topic-item-type',topic.is_open == 1? 'active':'']">{{ topic.is_open == 1 ? '公开' :'私密'}}</div> -->
+
+            <div>
+              <el-switch
+                v-model="topic.is_open"
+                @change="handleTopicOpen(topic)"
+                :active-value="1"
+                :inactive-value="0"
+                inline-prompt
+                active-text="公开"
+                inactive-text="私密"
+              />
             </div>
           </div>
           <div class="topic-item-text">
             {{ topic.messages.length ? topic.messages[0].content : null }}
           </div>
           <div class="topic-item-base">
-            <div class="base-box flex" v-if="topic.is_open !== 0">
-              <div class="text">{{ userInfo.name }}</div>
-              <div class="line"></div>
-              <div
-                class="flex"
-                @click.stop="handleTopicAction(1, topic)"
-                style="cursor: pointer"
-              >
-                <img
-                  :src="
-                    !topic.favorite_active
-                      ? 'https://assets.jiker.com/_for_common_project/2024/1227/admin/AnhT4Inxw4lkcEF6spx5WFJImQdmS3VS6LUgbEsL.svg'
-                      : 'https://assets.jiker.com/_for_common_project/2024/1227/admin/hFiJogbyXyfqh3S2cFJrIvOd0uiqyRHln32LahWJ.svg'
-                  "
-                  alt=""
-                />
-                <div class="text">{{ topic.favorite.length || "喜欢" }}</div>
-              </div>
+            <div class="flex" style="align-items: center">
+              <div class="base-box flex">
+                <div class="flex">
+                  <img
+                    :src="
+                      !topic.favorite_active
+                        ? 'https://assets.jiker.com/_for_common_project/2024/1227/admin/AnhT4Inxw4lkcEF6spx5WFJImQdmS3VS6LUgbEsL.svg'
+                        : 'https://assets.jiker.com/_for_common_project/2024/1227/admin/hFiJogbyXyfqh3S2cFJrIvOd0uiqyRHln32LahWJ.svg'
+                    "
+                    alt=""
+                  />
+                  <div class="text">{{ topic.favorite.length }}</div>
+                </div>
 
-              <div
-                class="flex"
-                style="margin-left: 18px; cursor: pointer"
-                @click.stop="handleTopicAction(2, topic)"
-              >
-                <img
-                  :src="
-                    !topic.collect_active
-                      ? 'https://assets.jiker.com/_for_common_project/2024/1227/admin/zzRTqjWwocSpW41IHUWuk1hpxcmyZnYnjl78vf45.svg'
-                      : 'https://assets.jiker.com/_for_common_project/2024/1227/admin/YRXLLtRFV2Dqog9MWzqRTOKewC35IDYzd1IyAHVD.svg'
-                  "
-                  alt=""
-                />
-                <div class="text">{{ topic.collect.length || "收藏" }}</div>
+                <div class="flex" style="margin-left: 18px">
+                  <img
+                    :src="
+                      !topic.collect_active
+                        ? 'https://assets.jiker.com/_for_common_project/2024/1227/admin/zzRTqjWwocSpW41IHUWuk1hpxcmyZnYnjl78vf45.svg'
+                        : 'https://assets.jiker.com/_for_common_project/2024/1227/admin/YRXLLtRFV2Dqog9MWzqRTOKewC35IDYzd1IyAHVD.svg'
+                    "
+                    alt=""
+                  />
+                  <div class="text">{{ topic.collect.length }}</div>
+                </div>
+                <div
+                  class="flex"
+                  style="margin-left: 18px; cursor: pointer"
+                  @click.stop="handleTopicAction(2, topic)"
+                ></div>
               </div>
+              <el-icon class="delete-icon" @click.stop="handleDelete(topic)">
+                <Delete />
+              </el-icon>
             </div>
-            <div v-else></div>
             <div class="item-base-label flex">
               <div v-for="tag in topic.tags">{{ tag.name }}</div>
             </div>
@@ -72,39 +78,6 @@
             class="topic-item-line"
           ></div>
         </div>
-        <!-- <div class="topic-item-content">
-            <div class="topic-item-title flex" style="justify-content: space-between">
-              1234
-              <div class="topic-item-type active">公开</div>
-            </div>
-            <div class="topic-item-text">
-              后台管理系统智菁系统管理后台管理系统智菁系统管理后台管理系统智菁系统管理后台管理系统智菁系统管理后台管理系统智菁系统管理后台管理系统智菁系统管理后台管理系统智菁系统管理后台管理系统智菁系统管理后台管理系统智菁系统管理后台管理系统智菁系统管理后台管理系统智菁系统管理后台管理系统智菁系统管理后台管理系统智菁系统管理后台管理系统智菁系统管理后台管理系统智菁系统管理后台管理系统智菁系统管理后台管理系统智菁系统管理后台管理系统智菁系统管理
-            </div>
-            <div class="topic-item-base">
-              <div class="base-box flex">
-                <div class="text">嘻嘻嘻</div>
-                <div class="line"></div>
-                <div class="flex">
-                  <img
-                        src="https://assets.jiker.com/_for_common_project/2024/1211/admin/hPLdAZdMpCYGQuJ3XJR6ZSH7VBoMTC6GTNnEEHLX.svg"
-                        alt=""
-                      />
-                  <div class="text">2</div>
-                </div>
-                <div class="flex" style="margin-left: 18px">
-                  <img
-                        src="https://assets.jiker.com/_for_common_project/2024/1211/admin/hPLdAZdMpCYGQuJ3XJR6ZSH7VBoMTC6GTNnEEHLX.svg"
-                        alt=""
-                      />
-                  <div class="text">2</div>
-                </div>
-              </div>
-              <div class="item-base-label flex">
-                <div>人工智能</div>
-                <div>人工智能</div>
-              </div>
-            </div>
-          </div> -->
       </div>
     </div>
     <div class="topic-list none" v-else>
@@ -124,6 +97,7 @@ import mixAxios from "mix-axios";
 import { reactive, ref } from "vue";
 const topicList = ref([]);
 const userInfo = ref({});
+const value3 = ref({});
 const getData = () => {
   mixAxios.get("/app-api/community/topic/my").then((res) => {
     topicList.value = res.map((item) => {
@@ -153,20 +127,60 @@ const handleTopicAction = (type, data) => {
 const getUser = () => {
   mixAxios.get("/api/user/info").then((res) => {
     userInfo.value = res;
-    console.log(userInfo.value);
-
     getData();
   });
 };
 const handleToDetail = (e) => {
   console.log(e);
-  const url = `/app/community/pure-page/nZ-lFmwb?id=${e.id}&from=my`;
+  // const url =`/app/community/pure-page/nZ-lFmwb?id=${e.id}&from=my`;
+  // window.location.href = url;
+  const url = `/app/community/pure-page/nZ-lFmwb?id=${e.id}&referer=${window.location.href}`;
   window.location.href = url;
+};
+const handleDelete = (topic) => {
+  // /app-api/community/topic/:id/switch-online
+  ElMessageBox.confirm(`确定要删除此话题吗?`, "提示", {
+    confirmButtonText: "确 定",
+    cancelButtonText: "取 消",
+    type: "warning",
+  }).then(() => {
+    mixAxios
+      .put(`/app-api/community/topic/${topic.id}/switch-online`, {
+        is_online: Boolean(topic.deleted_at),
+      })
+      .then(() => {
+        ElMessage.success("操作成功！");
+        getData();
+      });
+  });
+};
+
+const handleTopicOpen = (topic) => {
+  console.log(topic);
+  mixAxios
+    .put(`/app-api/community/topic/${topic.id}/open`, {
+      is_open: topic.is_open,
+    })
+    .then(() => {
+      ElMessage.success(
+        `${topic.is_open == 1 ? "话题公开成功" : "话题私密成功"}`
+      );
+    });
 };
 
 getUser();
 </script>
 <style scoped>
+.delete-icon {
+  color: rgba(0, 0, 0, 0.45);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.delete-icon:hover {
+  color: red;
+}
+
 .topic-box {
   padding-top: 18px;
 
@@ -226,7 +240,6 @@ getUser();
         /* border-top: 1px solid rgba(0, 0, 0, 0.06); */
         height: 138px;
         padding: 16px 24px 0;
-        cursor: pointer;
 
         &:hover {
           background: #fafafa;
@@ -240,6 +253,7 @@ getUser();
             width: 400px;
             color: rgba(0, 0, 0, 0.85);
             line-height: 24px;
+            cursor: pointer;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -264,7 +278,7 @@ getUser();
         }
 
         .topic-item-text {
-          margin: 8px 0;
+          margin: 8px 0 0;
           font-family: PingFangSC, PingFang SC;
           font-weight: 400;
           font-size: 14px;

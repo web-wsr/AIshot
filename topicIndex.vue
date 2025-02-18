@@ -3,11 +3,12 @@
     <div class="home-box">
       <div class="home-content">
         <!-- <div class="home-content-banner"></div> -->
-        <img
-          class="home-content-img"
-          src="https://assets.jiker.com/_for_common_project/2024/1220/admin/7wj02jkQ0GIj0pphiu8ebzJ3WttscY8KH6BtEeXe.png"
-          @click="handleToHelp"
-        />
+        <div class="home-content-img" @click="handleToHelp">
+          <div class="title">知识社区</div>
+          <div class="tag">共建 · 共创 · 共享</div>
+          <div class="text">遵守社区守则，共同维护健康网络环境</div>
+          <div class="btn">了解更多</div>
+        </div>
         <div class="home-topic-box">
           <div class="topic-top flex">
             <el-select
@@ -204,7 +205,12 @@
       </div>
     </div>
   </div>
-  <el-drawer v-model="drawer" size="1180px" :with-header="false">
+  <el-drawer
+    v-model="drawer"
+    @close="handleDrawerClose"
+    size="1180px"
+    :with-header="false"
+  >
     <div class="drawer-box" style="height: 100vh">
       <div class="drawer-header-box">
         <div class="flex">
@@ -243,21 +249,30 @@
                   : 'https://assets.jiker.com/_for_common_project/2024/1212/admin/IlIPFyfVqw4sYSqaiWYLQOYxQD3vF21CcxrmwifC.png'
               "
             />
-            <div
-              :class="[
-                'message-item-content',
-                (index + 1) % 2 == 0 ? 'right' : '',
-              ]"
-              :style="
-                (index + 1) % 2 == 0
-                  ? 'margin-right: 12px'
-                  : 'margin-left: 12px'
-              "
-            >
-              <div class="text">
-                <Markdown v-model="item.content" :toolbarsFlag="false" />
-                <!-- {{ item.content }} -->
-                <!-- <component :is="Markdown" v-model="item.content" :toolbarsFlag="false"></component> -->
+            <div>
+              <div
+                :class="[
+                  'message-item-content',
+                  (index + 1) % 2 == 0 ? 'right' : '',
+                ]"
+                :style="
+                  (index + 1) % 2 == 0
+                    ? 'margin-right: 12px'
+                    : 'margin-left: 12px'
+                "
+              >
+                <div class="text">
+                  <Markdown v-model="item.content" :toolbarsFlag="false" />
+                  <!-- {{ item.content }} -->
+                  <!-- <component :is="Markdown" v-model="item.content" :toolbarsFlag="false"></component> -->
+                </div>
+              </div>
+              <div
+                class="footer-tips"
+                v-if="(index + 1) % 2 !== 0"
+                style="text-align: left; padding-left: 14px; margin-top: 8px"
+              >
+                内容由 AI 大模型生成，请仔细甄别
               </div>
             </div>
           </div>
@@ -320,12 +335,7 @@
     append-to-body
   >
     <div>
-      <el-form
-        :model="formData"
-        :rules="rules"
-        label-width="auto"
-        style="max-width: 600px"
-      >
+      <el-form :model="formData" label-width="auto" style="max-width: 600px">
         <el-form-item label="标题：" prop="title">
           <el-input
             placeholder="请输入"
@@ -368,12 +378,12 @@
             <el-option label="私密，仅自己可见" :value="0" />
           </el-select>
           <!-- <span style="margin-right: 6px">
-              {{ formData.is_open == 1 ? "公开" : "私密" }}
-            </span>
-            <el-switch v-model="formData.is_open" style="
-                --el-switch-on-color: #00c700;
-                --el-switch-off-color: #cccccc;
-              " /> -->
+            {{ formData.is_open == 1 ? "公开" : "私密" }}
+          </span>
+          <el-switch v-model="formData.is_open" style="
+              --el-switch-on-color: #00c700;
+              --el-switch-off-color: #cccccc;
+            " /> -->
         </el-form-item>
       </el-form>
     </div>
@@ -418,10 +428,11 @@ const userData = ref({});
 const messageList = ref([
   {
     content: `为了您的问题被更好的解决，建议您：<br />1 - 尽量完整的描述问题;<br />2 - 提供相关背景信息；<br />3 - 避免使用模糊的词汇；<br />4 - 明确您的期望结果。
-  `,
+`,
     role: "gpt",
   },
 ]);
+
 const message = ref("");
 const newTag = ref("");
 const topicId = ref<any>(null);
@@ -439,6 +450,7 @@ const intervalId = ref();
 const formTagStatus = ref(false);
 const chatLoading = ref(false);
 const drawerContent = ref(null);
+
 watch(
   () => btnLoading.value,
   (newVal, oldVal) => {
@@ -448,7 +460,9 @@ watch(
   },
   { deep: true }
 );
+
 onMounted(() => {});
+
 const handleUpdateLoading = () => {
   let list = ["问题已接收", "理解问题", "正在思考中"];
   let index = list.findIndex((item) => btnLoadingText.value == item);
@@ -458,6 +472,9 @@ const handleUpdateLoading = () => {
     btnLoadingText.value = list[index + 1];
   }
 };
+const handleDrawerClose = () => {
+  getData();
+};
 const getData = () => {
   Promise.all([
     mixAxios.get("/api/user/info"),
@@ -466,7 +483,6 @@ const getData = () => {
     mixAxios.get("/app-api/community/talent-rank"),
     mixAxios.get("/app-api/community/topic/popular"),
     mixAxios.get("/app-api/community/my/data"),
-    mixAxios.get("/app-api/community/tags"),
   ]).then((res) => {
     userInfo.value = res[0];
     tagList.value = JSON.parse(JSON.stringify(res[2]));
@@ -478,15 +494,18 @@ const getData = () => {
     rankList.value = res[3];
     topicPopularList.value = res[4];
     userData.value = res[5];
+
     tagDrawerList.value = JSON.parse(JSON.stringify(res[2]));
     tagDrawerList.value.push({ id: 0, name: "添加选项" });
     getTopic();
   });
 };
+
 const handleToDetail = (e) => {
-  const url = `/app/community/pure-page/nZ-lFmwb?id=${e.id}&from=home`;
+  const url = `/app/community/pure-page/nZ-lFmwb?id=${e.id}&referer=${window.location.href}`;
   window.location.href = url;
 };
+
 const getTopic = () => {
   const params = {
     type: selectSort.value,
@@ -508,6 +527,7 @@ const getTopic = () => {
     ];
   });
 };
+
 const handleTopicAction = (type, data) => {
   const params = {
     topic_id: data.id,
@@ -515,9 +535,20 @@ const handleTopicAction = (type, data) => {
   };
   mixAxios.post("/app-api/community/topic/actions", params).then(() => {
     ElMessage.success("操作成功！");
+    if (type == 1) {
+      Promise.all([
+        mixAxios.get("/app-api/community/my/data"),
+        mixAxios.get("/app-api/community/talent-rank"),
+      ]).then((res) => {
+        userData.value = res[0];
+        rankList.value = res[1];
+      });
+    }
+
     getTopic();
   });
 };
+
 const getTopicTitle = async (content) => {
   const url = `https://gpt-service.jiker.cc/api/v2/chat`;
   const data = {
@@ -537,16 +568,17 @@ const getTopicTitle = async (content) => {
       Token: "1df65034830b214078fe",
     },
   });
-  console.log(title);
   return title.data.choices[0].message.content;
 };
+
 const handleSend = async () => {
-  console.log(messageList.value);
+  if (!message.value.trim()) {
+    return ElMessage.warning("请输入内容");
+  }
   if (btnLoading.value) {
     return;
   }
   btnLoading.value = true;
-  // if( messageList.value.length == 1 ){
   if (!topicId.value) {
     let title = await getTopicTitle(message.value);
     let data = await mixAxios.post("/app-api/community/topic/default", {
@@ -639,44 +671,66 @@ const handleSend = async () => {
     });
   });
 };
+
 const handleShowAddTag = (e) => {
   if (e[e.length - 1].name == "添加选项") {
     formTagStatus.value = true;
   }
 };
+
 const handleAddTag = () => {
-  const id = Math.floor(Math.random() * (-20 - 1 + 1)) + 1;
-  tagDrawerList.value.push({ id, name: newTag.value });
-  formData.tags[formData.tags.length - 1] = { id, name: newTag.value };
-  formTagStatus.value = false;
-  newTag.value = "";
-};
-const handleCancelTag = () => {
-  formData.tags.splice(1, formData.tags.length - 1);
-  formTagStatus.value = false;
-  newTag.value = "";
-};
-const handleBack = () => {
-  if (topicId.value) {
-    drawer.value = false;
+  if (!newTag.value) {
+    return ElMessage.warning("请输入标签名称");
   }
+
+  mixAxios
+    .post("/app-api/community/add/tag", { name: newTag.value })
+    .then((res) => {
+      const index = formData.tags.findIndex((item) => item.id == 0);
+      formData.tags.splice(index, 1, res);
+      console.log(formData.tags);
+      mixAxios.get("/app-api/community/tags").then((data) => {
+        console.log(data);
+        tagDrawerList.value = JSON.parse(JSON.stringify(data));
+        tagDrawerList.value.push({ id: 0, name: "添加选项" });
+        formTagStatus.value = false;
+        newTag.value = "";
+      });
+    });
 };
+
+const handleCancelTag = () => {
+  const index = formData.tags.findIndex((item) => item.id == 0);
+  formData.tags.splice(index, 1);
+  formTagStatus.value = false;
+  newTag.value = "";
+};
+
 const handleToHelp = () => {
   window.location.href = "/app/community/my/help/us";
 };
+
 const handleSubmit = () => {
+  console.log(formData.tags.length);
+  if (formData.tags.length == 0) {
+    return ElMessage.warning("请选择话题分类");
+  }
+  if (!formData.title) {
+    return ElMessage.warning("请输入话题标题");
+  }
   const params = {
     ...formData,
     topic_id: topicId.value,
   };
-  console.log(123);
   mixAxios.put("/app-api/community/topic", params).then(() => {
     dialogVisible.value = false;
     drawer.value = false;
     ElMessage.success("话题保存成功！");
   });
 };
+
 getData();
+
 const imgList = {
   star: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAlFJREFUWEft1knITWEYB/DfR+ZQhgVWyoqNkkRkSMqUoQwLJaykDGUoCVkYU8hQLCTjwsqQspBiIQuUDCmJLJSQnSGu89a5ddzOfc853735Np7tM/z/7/uMHbVarbsulI7/BP7RD/THeSzG72zGO5OCiTiLuXhdsnx2YwfW4FwrBDrwAONwFctLEJiMm+iH9ynxZ3W/qj+wDBczoJPwsAmJUTiABQ36kILwC9vxsQqBngjMR2YC3se0JgTG4BQCyUa5gfV4V4XABhzOCbYoScn1SCoWpr/WK7wYS3GvagoG4hUG5wC9wFj8ipA4hE3pq092pgj3YmsEYC3ORPSDcA3T8bMqgRmpc+8IwAfMw5MSXfGXSawGQhHtx+ySQWu4lAyanXhb0kcegRGJcxgcK9GtbKCM3XccT8l/KfLPEhiALdiY9G+fIscS+gC+DycQSOVKnUAojssJ8yElAlc1CemYn7Tf8zzHOoE5uIK+VaOXsP+U1tGjGIGgG4ZdSQGtQjuOlG84lo7jr0UpyOpHI/R9aKvOSJj1F9JuCMsnKrE2nJKk5GCyycYXBcnob2Mbnpb1KdoFYf0uSbdXj0jQz+lqvlMWuG5XRKBudzRZJOsiwTfjSETf8kU0NF1GIVCjvEGYmj8iBNpyEYUDYk8OyIq0hZvht+0iCjPiJYZnkEJvT0jaN+yBRmn7RRQAVicETmeQZiYX0d0mT2/7RRRwwoB6jDArbqUjtqjw23IRZUFmpSfW1GbzPYdRyxdR0SuL9C1dREXBW9KXHUQtgcScu5zAH1FNzCFQ6MznAAAAAElFTkSuQmCC",
 };
@@ -852,6 +906,16 @@ const imgList = {
   }
 }
 
+.footer-tips {
+  text-align: center;
+  font-family: PingFangSC, PingFang SC;
+  font-weight: 400;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.25);
+  line-height: 20px;
+  margin-top: 16px;
+}
+
 .drawer-box {
   background-color: #f5f5f5;
   padding: 0px;
@@ -865,18 +929,7 @@ const imgList = {
       margin: 0 auto;
       display: flex;
       height: 172px;
-
       flex-direction: column-reverse;
-
-      .footer-tips {
-        text-align: center;
-        font-family: PingFangSC, PingFang SC;
-        font-weight: 400;
-        font-size: 12px;
-        color: rgba(0, 0, 0, 0.25);
-        line-height: 20px;
-        margin-top: 16px;
-      }
 
       .footer-input-box {
         padding-bottom: 12px;
@@ -914,9 +967,9 @@ const imgList = {
         border: 1px solid #eeeeee;
 
         /* .footer-input {
-            width: 100%;
-            min-height: 56px;
-          } */
+          width: 100%;
+          min-height: 56px;
+        } */
 
         .input-btn-box {
           display: flex;
@@ -1063,6 +1116,52 @@ const imgList = {
         width: 718px;
         height: 256px;
         cursor: pointer;
+        background: linear-gradient(135deg, #ffefa9 0%, #d5ffd8 100%);
+        background-size: contain;
+        text-align: center;
+        padding-top: 42px;
+      }
+
+      .home-content-img .title {
+        font-family: PingFangSC, PingFang SC;
+        font-weight: 600;
+        font-size: 32px;
+        color: #000000;
+        line-height: 40px;
+      }
+
+      .home-content-img .tag {
+        width: 132px;
+        height: 26px;
+        line-height: 26px;
+        background: linear-gradient(270deg, #826600 0%, #345a00 100%);
+        border-radius: 2px;
+        font-family: PingFangSC, PingFang SC;
+        font-weight: 400;
+        font-size: 14px;
+        color: #ffffff;
+        margin: 4px auto 20px;
+      }
+
+      .home-content-img .text {
+        font-family: PingFangSC, PingFang SC;
+        font-weight: 400;
+        font-size: 22px;
+        color: #000000;
+        margin-bottom: 22px;
+      }
+
+      .home-content-img .btn {
+        width: 144px;
+        height: 40px;
+        line-height: 40px;
+        background: #000;
+        border-radius: 20px;
+        font-family: PingFangSC, PingFang SC;
+        font-weight: 500;
+        margin: 0 auto;
+        font-size: 14px;
+        color: #ffffff;
       }
 
       .home-content-banner {
@@ -1472,8 +1571,8 @@ const imgList = {
 }
 
 /* .page-header-item:nth-child(3) {
-      display: none;
-    } */
+    display: none;
+  } */
 
 .dialog-box {
   padding: 0px;
